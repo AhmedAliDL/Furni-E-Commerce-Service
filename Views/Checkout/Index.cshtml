@@ -1,0 +1,305 @@
+﻿@model UserOrder
+@inject UserManager<User> userManger
+
+@{
+#nullable disable
+    ViewData["Title"] = "Index";
+
+    var user = await userManger.FindByEmailAsync(User.Identity.Name);
+
+}
+
+<!-- Start Hero Section -->
+<div class="hero">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-5">
+                <div class="intro-excerpt">
+                    <h1>Checkout</h1>
+                </div>
+            </div>
+            <div class="col-lg-7">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Hero Section -->
+
+<div class="untree_co-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mb-5 mb-md-0">
+                <h2 class="h3 mb-3 text-black">Billing Details</h2>
+                <form asp-action="PlaceOrder" asp-controller="Checkout" method="post">
+                    @{
+                        int i = 0;
+                        double subtotalResult = 0d;
+                        foreach (var product in Model.Products)
+                        {
+                            var quantity = Model.ChoosenQuantity.FirstOrDefault(p => p.ProductId == product.ProductId)!.ProductQuantity;
+                            <input hidden asp-for="@Model.ChoosenQuantity[i].ProductQuantity" type="number" value="@quantity" />
+                            <input hidden asp-for="@Model.ChoosenQuantity[i].ProductId" type="number" value="@product.ProductId" />
+                            subtotalResult += (quantity * product.Price);
+                            i++;
+                        }
+
+                    }
+                    <input hidden asp-for="TotalPrice" id="totalPriceInput" value="" />
+                    <input hidden asp-for="OrderDiscount" id="orderDiscountInput" value="" />
+                    <div class="p-3 p-lg-5 border bg-white">
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="c_fname" class="text-black">First Name <span class="text-danger">*</span></label>
+                                <input value="@user.FName" disabled type="text" class="form-control" id="c_fname" name="c_fname">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="c_lname" class="text-black">Last Name <span class="text-danger">*</span></label>
+                                <input value="@user.LName" disabled type="text" class="form-control" id="c_lname" name="c_lname">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <label for="c_country" class="text-black">Country <span class="text-danger">*</span></label>
+                                <input value="@user.Country" disabled type="text" class="form-control" id="c_country" name="c_country" placeholder="Country">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <label for="c_city" class="text-black">City <span class="text-danger">*</span></label>
+                                <input asp-for="City" value="@user.City" disabled type="text" class="form-control" id="c_city" name="c_city" placeholder="City">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <label for="c_address" class="text-black">Address <span class="text-danger">*</span></label>
+                                <input asp-for="Address" value="@user.Address" type="text" class="form-control" id="c_address" name="c_address" placeholder="Street address">
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-5">
+                            <div class="col-md-6">
+                                <label for="c_email_address" class="text-black">Email Address <span class="text-danger">*</span></label>
+                                <input value="@user.Email" disabled type="text" class="form-control" id="c_email_address" name="c_email_address">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="c_phone" class="text-black">Phone <span class="text-danger">*</span></label>
+                                <input value="@user.PhoneNumber" disabled type="text" class="form-control" id="c_phone" name="c_phone" placeholder="Phone Number">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <label for="c_payment" class="text-black">Payment Way<span class="text-danger">*</span></label>
+                                <select class="form-control" id="paymentMethod">
+                                    <option value="1">Cash</option>
+                                    <option value="2">Visa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="visaDetails" style="display: none;">
+
+                            <div class="form-floating mb-3">
+                                <input class="form-control" asp-for="CardNumber" id="inputCardNumber" type="text" placeholder="" />
+                                <label for="inputCardNumber">Card Number</label>
+                                <span asp-validation-for="CardNumber" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input class="form-control" min="1" max="12" asp-for="ExpirationMonth" id="inputExpirationMonth" type="number" placeholder="" />
+                                <label for="inputExpirationMonth">Expiration Month</label>
+                                <span asp-validation-for="ExpirationMonth" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input class="form-control" asp-for="ExpirationYear" id="inputExpirationYear" type="text" placeholder="" />
+                                <label for="inputExpirationYear">Expiration Year</label>
+                                <span asp-validation-for="ExpirationYear" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input class="form-control" asp-for="CVV" id="inputCVV" type="text" placeholder="" />
+                                <label for="inputCVV">CVV</label>
+                                <span asp-validation-for="CVV" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" class="btn " value="Place Order">
+                        </div>
+
+
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+
+                <div class="row mb-5">
+                    <form id="coupon-form" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="col-md-12">
+                            <h2 class="h3 mb-3 text-black">Coupon Code</h2>
+                            <div class="p-3 p-lg-5 border bg-white">
+
+                                <label for="c_code" class="text-black mb-3">Enter your coupon code if you have one</label>
+                                <div class="input-group w-75 couponcode-wrap">
+                                    <input id="coupon" name="coupon" type="text" class="form-control me-2" id="c_code" placeholder="Coupon Code" aria-label="Coupon Code" aria-describedby="button-addon2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-black btn-sm" type="button" id="button-addon2">Apply</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-12">
+                        <h2 class="h3 mb-3 text-black">Your Order</h2>
+                        <div class="p-3 p-lg-5 border bg-white">
+                            <table class="table site-block-order-table mb-5">
+                                <thead>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        foreach (var product in Model.Products)
+                                        {
+                                            <tr>
+                                                <td>@product.ProductName</td>
+                                                <td>@Model.ChoosenQuantity.FirstOrDefault(p => p.ProductId == product.ProductId)!.ProductQuantity</td>
+                                                <td>$@product.Price</td>
+                                            </tr>
+                                        }
+                                        double subtotal = 0d;
+                                        foreach (var quantity in Model.ChoosenQuantity)
+                                        {
+                                            var productPrice = Model.Products.FirstOrDefault(p => p.ProductId == quantity.ProductId)!.Price;
+                                            subtotal += (quantity.ProductQuantity * productPrice);
+                                        }
+                                        <tr>
+                                            <td class="text-black font-weight-bold"><strong>Cart Subtotal</strong></td>
+                                            <td class="text-black font-weight-bold subtotal"><strong>$@subtotal</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-black font-weight-bold"><strong>Order Total</strong></td>
+                                            <td class="text-black font-weight-bold total"><strong>$@subtotal</strong></td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- </form> -->
+    </div>
+</div>
+
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/tiny-slider.js"></script>
+<script src="js/custom.js"></script>
+
+
+
+<script>
+    // Get the select element
+    const selectElement = document.getElementById('paymentMethod');
+    const visaDetails = document.getElementById('visaDetails');
+
+    // Add an event listener to detect changes
+    selectElement.addEventListener('change', function () {
+        // Get the selected value
+        const selectedValue = selectElement.value;
+
+        // If 'Visa' is selected (value = 2), show the visaDetails div
+        if (selectedValue === '2') {
+            visaDetails.style.display = 'block';  // Show the visa details
+        } else {
+            visaDetails.style.display = 'none';  // Hide the visa details
+        }
+    });
+</script>
+
+<script>
+    window.onload = function () {
+        const couponForm = document.getElementById('coupon-form');
+        const subtotalDisplay = document.querySelector('.subtotal strong'); // Subtotal field
+        const totalDisplay = document.querySelector('.total strong');       // Total field
+        const couponInput = document.getElementById('coupon');
+        const totalPriceInput = document.getElementById('totalPriceInput'); // Hidden input for total price
+
+        // Set the total price based on subtotal when the page loads
+        let subtotal = parseFloat(subtotalDisplay.textContent.replace('$', ''));
+        totalPriceInput.value = subtotal.toFixed(2); // Set the hidden input to the subtotal initially
+
+        if (!subtotalDisplay || !totalDisplay) {
+            console.error("Subtotal or Total elements not found");
+            return;
+        }
+
+        // Coupon application logic
+        document.getElementById('button-addon2').addEventListener('click', function () {
+            const formData = new FormData(couponForm);
+
+            fetch('/Coupon/CheckCoupon', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('[name="__RequestVerificationToken"]').value,
+                    'Accept': 'application/json',
+                },
+                body: new URLSearchParams(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let discount = parseFloat(data.data.discountPercentage);
+
+                        if (isNaN(discount) || discount < 0 || discount > 100) {
+                            alert('Invalid discount percentage.');
+                            return;
+                        }
+
+                        let subtotal = parseFloat(subtotalDisplay.textContent.replace('$', ''));
+
+                        if (isNaN(subtotal)) {
+                            console.error('Subtotal is not a valid number');
+                            alert('There was an issue calculating the total. Please try again.');
+                            return;
+                        }
+
+                        let total = subtotal - (subtotal * discount / 100);
+
+                        // Update the total display
+                        totalDisplay.textContent = `$${total.toFixed(2)}`;
+
+                        // Update the hidden input field with the total value
+                        totalPriceInput.value = total.toFixed(2);
+
+                        orderDiscountInput.value = discount.toFixed(2); 
+
+                        // Clear the coupon input
+                        couponInput.value = '';
+                        // Notify the user
+                        alert(`Discount of ${discount}% applied successfully!`);
+
+                    } else {
+                        alert('Coupon invalid or expired.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('There was an error processing your coupon.');
+                });
+        });
+    };
+
+</script>
+
+
+

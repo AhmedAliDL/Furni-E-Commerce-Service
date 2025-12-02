@@ -1,0 +1,185 @@
+﻿@model UserOrder
+@inject IProductCartItemRepository productCartItemRepository
+@{
+    ViewData["Title"] = "Index";
+}
+
+<!-- Start Hero Section -->
+<div class="hero">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-5">
+                <div class="intro-excerpt">
+                    <h1>Cart</h1>
+                </div>
+            </div>
+            <div class="col-lg-7"></div>
+        </div>
+    </div>
+</div>
+<!-- End Hero Section -->
+
+<div class="untree_co-section before-footer-section">
+    <div class="container">
+        <div class="row mb-5">
+            <form asp-action="Index" asp-controller="Checkout" method="post">
+                <div class="col-md-12">
+                    <div class="site-blocks-table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="product-thumbnail">Image</th>
+                                    <th class="product-name">Product</th>
+                                    <th class="product-price">Price</th>
+                                    <th class="product-quantity">Quantity</th>
+                                    <th class="product-total">Total</th>
+                                    <th class="product-remove">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int idx = 0; idx < Model.Products.Count; idx++)
+                                {
+                                    var product = Model.Products[idx];
+                                    int quantity = productCartItemRepository.GetProductsCartItems(product.ProductId, Model.CartItemsId).ItemQuantity;
+                                    Model.ChoosenQuantity.Add(
+                                    new()
+                {
+                    ProductId = product.ProductId
+                }
+                                    );
+                                    <tr>
+                                        <td class="product-thumbnail">
+                                            <img src="@product.ImageUrl" alt="Image" class="img-fluid">
+                                        </td>
+                                        <td class="product-name">
+                                            <h2 class="h5 text-black">@product.ProductName</h2>
+                                        </td>
+                                        <td>$<span class="unit-price" data-price="@product.Price">@product.Price</span></td>
+                                        <td>
+                                            <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
+                                                <input asp-for="@Model.ChoosenQuantity[idx].ProductQuantity" type="number" min="1" max="@product.StockQuantity" class="form-control text-center quantity-amount" value="@quantity" aria-label="Quantity input" aria-describedby="button-addon1">
+                                                <input hidden asp-for="@Model.ChoosenQuantity[idx].ProductId" type="number" value="@product.ProductId" />
+                                            </div>
+                                        </td>
+                                        <td>$<span class="price" data-price="@product.Price">@product.Price</span></td>
+                                        <td>
+                                            <a asp-action="DeleteProduct" asp-controller="ShoppingCart" asp-route-productId="@product.ProductId" asp-route-cartItemsId="@Model.CartItemsId" class="btn btn-black btn-sm text-danger">X</a>
+                                        </td>
+                                    </tr>
+                                }
+
+                                <!-- Cart Totals Section -->
+                                <tr class="cart-totals-section">
+                                    <td colspan="5" class="text-right">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2" class="text-right h4">Cart Totals</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <!-- Subtotal Label -->
+                                                    <td>
+                                                        <span class="text-black">Subtotal</span>
+                                                    </td>
+                                                    <!-- Subtotal Value -->
+                                                    <td class="text-right">
+                                                        <strong class="text-black subtotal">$0.00</strong>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row mb-5 text-right">
+                        <div class="col-md-12">
+                            <input type="submit" class="btn" value="Proceed To Checkout">
+                            <a asp-action="Index" asp-controller="Shop" class="btn btn-outline-black btn-sm btn-block">Continue Shopping</a>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/tiny-slider.js"></script>
+<script src="/js/custom.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = document.querySelectorAll('tbody tr');
+        const subtotalDisplay = document.querySelector('.subtotal');
+
+        if (!subtotalDisplay) {
+            console.error("Subtotal element not found");
+            return;
+        }
+
+        function updateCartTotals() {
+            let subtotal = 0;
+
+            rows.forEach(row => {
+                const quantityInput = row.querySelector('.quantity-amount');
+                const unitPriceElement = row.querySelector('.unit-price');
+                const priceDisplay = row.querySelector('.price');
+
+                if (!quantityInput || !unitPriceElement || !priceDisplay) {
+                    console.error("Price or Quantity element not found for a product row");
+                    return;
+                }
+
+                const unitPrice = parseFloat(unitPriceElement.getAttribute('data-price'));
+                const quantity = parseInt(quantityInput.value);
+                const totalPrice = unitPrice * quantity;
+
+                priceDisplay.textContent = totalPrice.toFixed(2);
+                subtotal += totalPrice;
+            });
+
+            subtotalDisplay.textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        rows.forEach(row => {
+            const quantityInput = row.querySelector('.quantity-amount');
+
+            if (!quantityInput) return;
+
+            quantityInput.addEventListener('input', function () {
+                let value = parseInt(quantityInput.value);
+                const min = parseInt(quantityInput.getAttribute('min'));
+                const max = parseInt(quantityInput.getAttribute('max'));
+
+                if (value < min) {
+                    quantityInput.value = min;
+                } else if (value > max) {
+                    quantityInput.value = max;
+                }
+
+                updateCartTotals();
+            });
+        });
+
+        updateCartTotals();
+    });
+</script>
+
+<style>
+    .cart-totals-section {
+        margin-top: 20px;
+    }
+
+
+    .text-right {
+        text-align: right;
+    }
+</style>

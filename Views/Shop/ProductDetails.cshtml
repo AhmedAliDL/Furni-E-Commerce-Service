@@ -1,0 +1,278 @@
+﻿@model Products
+@{
+    ViewData["Title"] = "Product Details";
+}
+<style>
+    body {
+        background-image: linear-gradient(
+            to right bottom,
+            #b91eda,
+            #a02ae0,
+            #8234e5,
+            #5d3be8,
+            #1241eb
+        );
+        height: 100%;
+        margin: 0;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    main {
+        max-width: 720px;
+        margin: 5% auto;
+    }
+
+    .card {
+        box-shadow: 0 6px 6px rgba(0, 0, 0, 0.3);
+        transition: 200ms;
+        background: #fff;
+    }
+
+    .card__title {
+        display: flex;
+        align-items: center;
+        padding: 30px 40px;
+    }
+
+    .card__title h3 {
+        flex: 0 1 200px;
+        text-align: right;
+        margin: 0;
+        color: #252525;
+        font-family: sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        text-transform: uppercase;
+    }
+
+    .card__title .icon {
+        flex: 1 0 10px;
+        background: #115dd8;
+        color: #fff;
+        padding: 10px 10px;
+        transition: 200ms;
+    }
+
+    .card__title .icon a {
+        color: #fff;
+    }
+
+    .card__title .icon:hover {
+        background: #252525;
+    }
+
+    .card__body {
+        padding: 0 60px;
+        display: flex;
+        flex-flow: row nowrap;
+        margin-bottom: 25px;
+    }
+
+    .card__body > .half {
+        box-sizing: border-box;
+        padding: 0 15px;
+        flex: 1 0 50%;
+    }
+
+    .featured_text h1 {
+        margin: 0;
+        padding: 0;
+        font-weight: 800;
+        font-family: "Montserrat", sans-serif;
+        font-size: 64px;
+        line-height: 50px;
+        color: #181e28;
+    }
+
+    .featured_text p.sub {
+        font-family: "Montserrat", sans-serif;
+        font-size: 26px;
+        text-transform: uppercase;
+        color: #686e77;
+        font-weight: 300;
+        margin-bottom: 5px;
+    }
+
+    .featured_text p.price {
+        font-family: "Fjalla One", sans-serif;
+        color: #252525;
+        font-size: 26px;
+    }
+
+    .image {
+        padding-top: 15px;
+        width: 100%;
+    }
+
+    .image img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .description {
+        margin-bottom: 25px;
+    }
+
+    .description p {
+        margin: 0;
+        font-family: "Open Sans", sans-serif;
+        font-weight: 300;
+        line-height: 27px;
+        font-size: 16px;
+        color: #555;
+    }
+
+    span.stock {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 600;
+        color: #a1cc16;
+    }
+    span.stock2 {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 600;
+        color: #E4080A;
+    }
+
+    .reviews .stars {
+        display: inline-block;
+        list-style: none;
+        padding: 0;
+    }
+
+    .reviews .stars > li {
+        display: inline-block;
+    }
+
+    .reviews .stars .fa {
+        color: #f7c01b;
+    }
+
+    .reviews > span {
+        font-family: "Open Sans", sans-serif;
+        font-size: 14px;
+        margin-left: 5px;
+        color: #555;
+    }
+
+    .card__footer {
+        padding: 30px 40px;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        position: relative;
+    }
+
+    .card__footer::before {
+        content: "";
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 40px;
+        width: calc(100% - 40px);
+        height: 3px;
+        background: #115dd8;
+        background: linear-gradient(to right, #115dd8 0%, #115dd8 20%, #ddd 20%, #ddd 100%);
+    }
+
+    .recommend {
+        flex: 1 0 10px;
+    }
+
+    .recommend p {
+        margin: 0;
+        font-family: "Montserrat", sans-serif;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .recommend h3 {
+        margin: 0;
+        font-size: 20px;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #115dd8;
+    }
+
+    .action button {
+        cursor: pointer;
+        border: 1px solid #115dd8;
+        padding: 14px 30px;
+        border-radius: 200px;
+        color: #fff;
+        background: #115dd8;
+        font-family: "Open Sans", sans-serif;
+        font-size: 16px;
+        transition: 200ms;
+    }
+
+    .action button:hover {
+        background: #fff;
+        color: #115dd8;
+    }
+
+</style>
+<br />
+<br />
+<div class="card">
+    <br />
+    <br />
+    <div class="card__body">
+        <div class="half">
+            <div class="featured_text">
+                <h1>Furni</h1>
+                <br />
+                <p class="sub">@Model.ProductName</p>
+                <br />
+                <p class="price">$@Model.Price</p>
+            </div>
+            <div class="image">
+                <img src="@Model.ImageUrl" alt="">
+            </div>
+        </div>
+        <div class="half">
+            <div class="description">
+                <p>@Model.Description</p>
+            </div>
+            @if (Model.IsActive)
+            {
+                <span class="stock"><i class="fa fa-pen"></i> In stock</span>
+            }
+            else
+            {
+                <span class="stock2"><i class="fa fa-pen"></i> Out of stock</span>
+            }
+            <div class="reviews">
+                <ul class="stars">
+                    <li><i class="fa fa-star"></i></li>
+                    <li><i class="fa fa-star"></i></li>
+                    <li><i class="fa fa-star"></i></li>
+                    <li><i class="fa fa-star"></i></li>
+                    <li><i class="fa fa-star-o"></i></li>
+                </ul>
+                <span>(64 reviews)</span>
+            </div>
+        </div>
+    </div>
+    <div class="card__footer">
+        <form method="post" asp-action="AddCartItem" asp-controller="Shop" asp-route-productId="@Model.ProductId">
+            <div class="action">
+                @if (Model.IsActive)
+                {
+                    <input type="submit" class="btn" value="Add to cart">
+                }
+                else
+                {
+                    <input disabled type="submit" class="btn" value="Add to cart">
+                }
+            </div>
+        </form>
+    </div>
+</div>
+<br />
+<br />
+<br />

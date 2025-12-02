@@ -1,0 +1,74 @@
+﻿@model List<Products>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<!-- Start Hero Section -->
+<div class="hero">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-5">
+                <div class="intro-excerpt">
+                    <h1>Shop</h1>
+                </div>
+            </div>
+            <div class="col-lg-7">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Hero Section -->
+
+
+
+<div class="untree_co-section product-section before-footer-section">
+    <div class="container">
+        <div class="row">
+
+            @foreach (var product in Model)
+            {
+                <!-- Start Column 1 -->
+                <div class="col-12 col-md-4 col-lg-3 mb-5">
+                    <div class="product-item">
+                        <!-- Link to Product Details -->
+                        <a asp-action="ProductDetails" asp-controller="Shop" asp-route-productId="@product.ProductId">
+                            <img src="@product.ImageUrl" style="width:300px;height:300px" class="img-fluid product-thumbnail">
+                        </a>
+
+                        <h3 class="product-title">@product.ProductName</h3>
+                        <strong class="product-price">$@product.Price</strong>
+
+                        <!-- Button for Adding to Cart -->
+                        <span class="icon-cross" onclick="addCartItem(@product.ProductId)">
+                            <img src="/images/cross.svg" class="img-fluid">
+                        </span>
+                    </div>
+                </div>
+                <!-- End Column 1 -->
+            }
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/tiny-slider.js"></script>
+<script src="/js/custom.js"></script>
+
+<script>
+    function addCartItem(productId) {
+        $.ajax({
+            url: '/Shop/AddCartItem',
+            type: 'POST',
+            data: { productId: productId },
+            success: function (response) {
+                alert('Item added to cart!');
+                // You can add other actions here like updating the cart count.
+            },
+            error: function (xhr, status, error) {
+                console.error('Item is out of stock:', error);
+                alert('Item is out of stock.');
+            }
+        });
+    }
+</script>
