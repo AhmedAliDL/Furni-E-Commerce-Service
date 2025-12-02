@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Furni E-Commerce Service.props" />
+</Project>
